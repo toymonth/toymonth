@@ -1,18 +1,29 @@
-## Hi there 👋
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-my first repository
+contract PocketTwo {
+    address public owner;
+    uint256 public total;
 
-<!--
-**toymonth/toymonth** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+    event Deposited(address indexed from, uint256 amount);
+    event Withdrawn(uint256 amount);
 
-Here are some ideas to get you started:
+    constructor() {
+        owner = msg.sender;
+    }
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+    function deposit() external payable {
+        require(msg.value > 0, "Must send ETH");
+        total += msg.value;
+        emit Deposited(msg.sender, msg.value);
+    }
+
+    function withdraw() external {
+        require(msg.sender == owner, "Not owner");
+        uint256 amount = address(this).balance;
+        total = 0;
+        (bool success, ) = owner.call{value: amount}("");
+        require(success, "Transfer failed");
+        emit Withdrawn(amount);
+    }
+}
