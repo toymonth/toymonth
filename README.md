@@ -1521,3 +1521,34 @@ contract MarkNine {
         return markers.length;
     }
 }
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract VisaNine {
+    address public owner;
+    mapping(address => bool) public hasVisa;
+
+    event VisaGranted(address indexed user);
+    event VisaRevoked(address indexed user);
+
+    constructor() {
+        owner = msg.sender;
+        hasVisa[msg.sender] = true;
+    }
+
+    function grantVisa(address user) external {
+        require(msg.sender == owner, "Not owner");
+        hasVisa[user] = true;
+        emit VisaGranted(user);
+    }
+
+    function revokeVisa(address user) external {
+        require(msg.sender == owner, "Not owner");
+        hasVisa[user] = false;
+        emit VisaRevoked(user);
+    }
+
+    function checkVisa(address user) external view returns (bool) {
+        return hasVisa[user];
+    }
+}
